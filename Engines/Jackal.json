@@ -1,7 +1,7 @@
 {
     "private" : false,
     "nps"     : 1250000,
-    "source"  : "https://github.com/TomaszJaworski777/Jackal-rewrite",
+    "source"  : "https://github.com/TomaszJaworski777/Jackal",
 
     "build" : {
         "path"      : "",
@@ -83,17 +83,17 @@
         },
 
         "STC" : {
-            "dev_options"      : "Threads=1 Hash=256",
+            "dev_options"      : "Threads=1 Hash=32",
             "dev_time_control" : "10.0+0.10"
         },
 
         "MTC" : {
-            "dev_options"      : "Threads=1 Hash=256",
+            "dev_options"      : "Threads=1 Hash=64",
             "dev_time_control" : "30.0+0.30"
         },
 
         "LTC" : {
-            "dev_options"      : "Threads=1 Hash=512",
+            "dev_options"      : "Threads=1 Hash=256",
             "dev_time_control" : "60.0+0.60"
         },
 
