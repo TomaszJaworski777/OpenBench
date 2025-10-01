@@ -22,53 +22,53 @@
         },
 
         "STC" : {
-            "both_options"      : "Threads=1 Hash=32 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=32 MinimalPrint=true",
             "both_time_control" : "10.0+0.1",
             "workload_size"     : 32
         },
 
         "LTC" : {
-            "both_options"      : "Threads=1 Hash=64 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=64 MinimalPrint=true",
             "both_time_control" : "40.0+0.4",
             "workload_size"     : 8
         },
 
         "STC regression" : {
-            "both_options"      : "Threads=1 Hash=32 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=32 MinimalPrint=true",
             "both_time_control" : "10.0+0.1",
             "workload_size"     : 32,
             "test_bounds"       : "[-5.00, 0.00]"
         },
 
         "LTC regression" : {
-            "both_options"      : "Threads=1 Hash=64 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=64 MinimalPrint=true",
             "both_time_control" : "40.0+0.4",
             "workload_size"     : 8,
             "test_bounds"       : "[-5.00, 0.00]"
         },
 
         "STC progtest" : {
-            "both_options"      : "Threads=1 Hash=32 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=32 MinimalPrint=true",
             "both_time_control" : "10.0+0.1",
             "workload_size"     : 32,
             "test_max_games"    : 3000
         },
 
         "LTC progtest" : {
-            "both_options"      : "Threads=1 Hash=64 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=64 MinimalPrint=true",
             "both_time_control" : "60.0+0.6",
             "workload_size"     : 8,
             "test_max_games"    : 1000
         },
 
         "SMP STC" : {
-            "both_options"      : "Threads=4 Hash=128 UCI_Minimal=true",
+            "both_options"      : "Threads=4 Hash=128 MinimalPrint=true",
             "both_time_control" : "10.0+0.1",
             "workload_size"     : 32
         },
 
         "SMP LTC" : {
-            "both_options"      : "Threads=4 Hash=256 UCI_Minimal=true",
+            "both_options"      : "Threads=4 Hash=256 MinimalPrint=true",
             "both_time_control" : "40.0+0.4",
             "workload_size"     : 8
         }
@@ -83,22 +83,22 @@
         },
 
         "STC" : {
-            "dev_options"      : "Threads=1 Hash=32 UCI_Minimal=true",
+            "dev_options"      : "Threads=1 Hash=32 MinimalPrint=true",
             "dev_time_control" : "10.0+0.10"
         },
 
         "MTC" : {
-            "dev_options"      : "Threads=1 Hash=64 UCI_Minimal=true",
+            "dev_options"      : "Threads=1 Hash=64 MinimalPrint=true",
             "dev_time_control" : "30.0+0.30"
         },
 
         "LTC" : {
-            "dev_options"      : "Threads=1 Hash=256 UCI_Minimal=true",
+            "dev_options"      : "Threads=1 Hash=256 MinimalPrint=true",
             "dev_time_control" : "60.0+0.60"
         },
 
         "VLTC" : {
-            "dev_options"      : "Threads=1 Hash=512 UCI_Minimal=true",
+            "dev_options"      : "Threads=1 Hash=512 MinimalPrint=true",
             "dev_time_control" : "120.0+1.20"
         }
     },
@@ -112,7 +112,7 @@
         },
 
         "40k Nodes" : {
-            "both_options"      : "Threads=1 Hash=512 UCI_Minimal=true",
+            "both_options"      : "Threads=1 Hash=512 MinimalPrint=true",
             "both_time_control" : "N=40000"
         }
     }
