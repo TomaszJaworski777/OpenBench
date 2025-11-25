@@ -26,68 +26,86 @@
         {% endblock %}
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-
-                {
-                    var timestamps = document.getElementsByClassName('timestamp');
-
-                    var options = {
-                        year   : 'numeric', month  : '2-digit',
-                        day    : '2-digit', hour   : '2-digit',
-                        minute : '2-digit', second : '2-digit',
-                        hour12 : false,
-                    };
-
-                    for (var i = 0; i < timestamps.length; i++) {
+            function formatTimestamps() {
+                var timestamps = document.getElementsByClassName('timestamp');
+                var timeOptions = {
+                    year : 'numeric', month : '2-digit', day : '2-digit', 
+                    hour : '2-digit', minute : '2-digit', second : '2-digit', 
+                    hour12 : false,
+                };
+                for (var i = 0; i < timestamps.length; i++) {
+                    if (!timestamps[i].dataset.formatted) { 
                         var date = new Date(1000 * timestamps[i].textContent);
-                        timestamps[i].textContent = date.toLocaleString(undefined, options);
+                        timestamps[i].textContent = date.toLocaleString(undefined, timeOptions);
+                        timestamps[i].dataset.formatted = "true"; // Mark as done
                     }
                 }
 
-                {
-                    var datestamps = document.getElementsByClassName('datestamp');
-
-                    var options = {
-                        month  : 'short',
-                        day    : '2-digit',
-                    };
-
-                    for (var i = 0; i < datestamps.length; i++) {
+                var datestamps = document.getElementsByClassName('datestamp');
+                var dateOptions = { month : 'short', day : '2-digit' };
+                for (var i = 0; i < datestamps.length; i++) {
+                    if (!datestamps[i].dataset.formatted) {
                         var date = new Date(1000 * datestamps[i].textContent);
-                        datestamps[i].textContent = date.toLocaleString(undefined, options);
+                        datestamps[i].textContent = date.toLocaleString(undefined, dateOptions);
+                        datestamps[i].dataset.formatted = "true";
                     }
                 }
+                
+                const cells = document.querySelectorAll('.engine-options');
+                cells.forEach(cell => {
+                    if (cell.dataset.formatted) return;
+                    
+                    if (cell.textContent.split(/\s+/).length <= 2) return;
 
-                {
-                    const cells = document.querySelectorAll('.engine-options');
-
-                    cells.forEach(cell => {
-
-                        // Only have Threads= and Hash= settings
-                        if (cell.textContent.split(/\s+/).length <= 2)
-                            return;
-
-                        // Only display Threads=X Hash=X ...
-                        const re_threads = cell.textContent.match(/Threads=\d+/)[0];
-                        const re_hash    = cell.textContent.match(/Hash=\d+/)[0];
-                        const new_text   = re_threads + ' ' + re_hash + ' ...'
-
-                        // Add all options into the popup text
+                    const re_threads = (cell.textContent.match(/Threads=\d+/) || [''])[0];
+                    const re_hash    = (cell.textContent.match(/Hash=\d+/) || [''])[0];
+                    
+                    if(re_threads && re_hash) {
+                        const new_text   = re_threads + ' ' + re_hash + ' ...';
                         const popup = document.createElement('div');
                         popup.classList.add('engine-options-popup');
                         popup.innerHTML = cell.textContent.trim().replace(/\s+/g, '<br>');
-
-                        // Prune text, and append popup
                         cell.textContent = new_text;
                         cell.appendChild(popup);
-                    });
+                        cell.dataset.formatted = "true";
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                
+                formatTimestamps();
+
+                window.toggle_sidebar = function() {
+                    document.body.classList.toggle('sidebar-open');
                 }
 
-            }, false);
+                setInterval(function() {
+                    fetch(window.location.href)
+                        .then(response => response.text())
+                        .then(html => {
+                            var parser = new DOMParser();
+                            var doc = parser.parseFromString(html, "text/html");
 
-            function toggle_sidebar() {
-                document.body.classList.toggle('sidebar-open')
-            }
+                            var newStats = doc.querySelector('.header-stats');
+                            var oldStats = document.querySelector('.header-stats');
+                            if (newStats && oldStats) {
+                                if (newStats.innerHTML !== oldStats.innerHTML) {
+                                    oldStats.innerHTML = newStats.innerHTML;
+                                }
+                            }
+
+                            var newTable = doc.querySelector('.test-list');
+                            var oldTable = document.querySelector('.test-list');
+                            if (newTable && oldTable) {
+                                oldTable.innerHTML = newTable.innerHTML;
+                                formatTimestamps(); 
+                            }
+                        })
+                        .catch(err => console.log('Update skipped:', err));
+                }, 1000);
+
+            }, false);
         </script>
     </head>
 
