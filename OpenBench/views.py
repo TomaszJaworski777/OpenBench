@@ -68,6 +68,11 @@ class UnableToAuthenticate(Exception):
 def render(request, template, content={}, always_allow=False, error=None, warning=None, status=None):
 
     data = content.copy()
+
+    data.update({ 'worker_count' : OpenBench.utils.getMachineCount() })
+    data.update({ 'worker_threads' : OpenBench.utils.getMachineConcurrency() })
+    data.update({ 'worker_speed' : OpenBench.utils.getMachineSpeed() })
+
     data.update({ 'config' : OPENBENCH_CONFIG })
     data.update({ 'static_version' : OPENBENCH_STATIC_VERSION })
 

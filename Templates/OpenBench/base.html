@@ -7,7 +7,9 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="icon" type="image/svg+xml" href="{% static 'logo.svg' %}?{{ static_version }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'resources/logo.png' %}?{{ static_version }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'resources/logo.png' %}?{{ static_version }}">
+
         <link rel="stylesheet" href="{% static 'style.css' %}?{{ static_version }}">
         <link rel="stylesheet" href="{% static 'base.css' %}?{{ static_version }}">
         <link rel="stylesheet" href="{% static 'form.css' %}?{{ static_version }}">
@@ -18,7 +20,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
 
-        <title>OpenBench</title>
+        <title>JackalBench</title>
 
         {% block scripts %}
         {% endblock %}
@@ -90,81 +92,117 @@
     </head>
 
     <body>
+        <div id="main-header">
+            <button id="sidebar-toggle" onclick="toggle_sidebar()" style="background: transparent; border: none; color: #8a8d93; font-size: 1.5rem; margin-right: 25px; cursor: pointer;">
+                <i class="fa-solid fa-bars fa-fw"></i>
+            </button>
+
+            <a href="/" style="display: flex; align-items: center; text-decoration: none;">
+                {% load static %}
+                <img src="{% static 'resources/logo.png' %}" alt="Jackal Logo" style="height: 65px; width: auto; margin-right: 20px;">
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <span style="font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.8rem; letter-spacing: 1px; line-height: 1; color: var(--color-font1);">JACKALBENCH</span>
+                    <span style="font-family: 'Oswald', sans-serif; font-size: 0.9rem; letter-spacing: 2px; color: var(--color-font2); text-transform: uppercase; margin-top: 4px;">Testing Framework</span>
+                </div>
+            </a>
+
+            <div class="header-right-group">
+                <div class="header-stats">
+
+                    <div class="stat-item">
+                        <div class="digital-counter">
+                            <span class="ghost">8888</span>
+                            <span class="value">{{worker_count}}</span>
+                        </div>
+                        <span class="stat-label">WORKERS</span>
+                    </div>
+
+                    <div class="stat-divider"></div>
+
+                    <div class="stat-item">
+                        <div class="digital-counter">
+                            <span class="ghost">8888</span>
+                            <span class="value">{{worker_threads}}</span>
+                        </div>
+                        <span class="stat-label">THREADS</span>
+                    </div>
+
+                    <div class="stat-divider"></div>
+
+                    <div class="stat-item">
+                        <div class="digital-counter">
+                            <span class="ghost">8888</span>
+                            <span class="value">{{worker_speed}}</span>
+                        </div>
+                        <span class="stat-label">MNPS</span>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    {% if user.is_authenticated %}
+                        <a href="/profile/" class="header-btn">
+                            <i class="fa-solid fa-user fa-fw"></i> Profile
+                        </a>
+                        <a href="/logout/" class="header-btn logout-btn">
+                            <i class="fa-solid fa-right-from-bracket fa-fw"></i> Logout
+                        </a>
+                    {% else %}
+                        <a href="/login" class="header-btn">
+                            <i class="fa-solid fa-right-to-bracket fa-fw"></i> Login
+                        </a>
+                        <a href="/register" class="header-btn">
+                            <i class="fa-solid fa-registered fa-fw"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div> 
+        </div>
 
         <div id="sidebar">
+            <li class="{% if '/index' in request.path or request.path == '/' %}active{% endif %}">
+                <a href="/index"><i class="fa-solid fa-table-columns fa-fw"></i> Dashboard</a>
+            </li>
 
-            <ul>
-                <li class="header">Admin</li>
-                {% if user.is_authenticated %}
-                    <li><a href="/logout/"><i class="fa-solid fa-right-from-bracket fa-fw"></i> Logout</a></li>
-                    <li><a href="/profile/"><i class="fa-solid fa-user fa-fw"></i> Profile</a></li>
-                {% else %}
-                    <li><a href="/login"><i class="fa-solid fa-right-to-bracket fa-fw"></i> Login</a></li>
-                    <li><a href="/register"><i class="fa-solid fa-registered fa-fw"></i> Register</a></li>
-                {% endif %}
-            </ul>
+            <li class="{% if '/search' in request.path %}active{% endif %}">
+                <a href="/search"><i class="fa-solid fa-magnifying-glass fa-fw"></i> Search</a>
+            </li>
 
-            <hr>
+            {% if user.is_authenticated %}
+            <li class="{% if '/test/new/' in request.path %}active{% endif %}">
+                <a href="/test/new/"><i class="fa-solid fa-flask fa-fw"></i> Create Test</a>
+            </li>
 
-            <ul>
-                <li class="header">Tests</li>
-                <li><a href="/index"><i class="fa-solid fa-house fa-fw"></i> Index</a></li>
-                <li><a href="/greens"><i class="fa-solid fa-heart fa-fw"></i> Greens</a></li>
-                <li><a href="/search"><i class="fa-solid fa-magnifying-glass fa-fw"></i> Search</a></li>
-            </ul>
+            <li class="{% if '/tune/new/' in request.path %}active{% endif %}">
+                <a href="/tune/new/"><i class="fa-solid fa-gauge-high fa-fw"></i> Create Tune</a>
+            </li>
+            {% endif %}
 
-            <hr>
+            <li class="{% if '/users' in request.path %}active{% endif %}">
+                <a href="/users"><i class="fa-solid fa-users fa-fw"></i> Users</a>
+            </li>
 
-            <ul>
-                <li class="header">Actions</li>
-                <li><a href="/test/new/"><i class="fa-solid fa-plus fa-fw"></i> Create Test</a></li>
-                <li><a href="/tune/new/"><i class="fa-solid fa-vial fa-fw"></i> Create Tune</a></li>
-                <li><a href="/datagen/new/"><i class="fa-solid fa-database fa-fw"></i> Create Datagen</a></li>
-                <li><a href="/newNetwork"><i class="fa-solid fa-upload fa-fw"></i> Upload Net</a></li>
-            </ul>
+            <li class="{% if '/events' in request.path %}active{% endif %}">
+                <a href="/events"><i class="fa-solid fa-circle-exclamation fa-fw"></i> Events</a>
+            </li>
 
-            <hr>
+            <li class="{% if '/errors' in request.path %}active{% endif %}">
+                <a href="/errors"><i class="fa-solid fa-exclamation-triangle fa-fw"></i> Errors</a>
+            </li>
 
-            <ul>
-                <li class="header">Info</li>
-                <li><a href="/users"><i class="fa-solid fa-users fa-fw"></i> Users</a></li>
-                <li><a href="/events"><i class="fa-solid fa-circle-exclamation fa-fw"></i> Events</a></li>
-                <li><a href="/errors"><i class="fa-solid fa-exclamation-triangle fa-fw"></i> Errors</a></li>
-                <li><a href="/machines"><i class="fa-solid fa-microchip fa-fw"></i> Machines</a></li>
-                <li><a href="/networks"><i class="fa-solid fa-circle-nodes fa-fw"></i> Networks</a></li>
-            </ul>
+            <li class="{% if '/machines' in request.path %}active{% endif %}">
+                <a href="/machines"><i class="fa-solid fa-microchip fa-fw"></i> Machines</a>
+            </li>
 
-            <hr>
-
-            <ul>
-                <li class="header">Support</li>
-                <li><a href="{{config.client_repo_url}}"><i class="fa-brands fa-github fa-fw"></i> OpenBench</a></li>
-                <li><a href="https://discord.gg/9MVg7fBTpM"><i class="fa-brands fa-discord fa-fw"></i> Discord</a></li>
-            </ul>
-
-            <hr>
-
-            <ul>
-                <li class="header">Engines</li>
-                {% for engine, data in config.engines.items %}
-                    <li><a href="{{data.source}}">{{engine}}</a></li>
-                {% endfor %}
-            </ul>
-
-            <hr>
-
+            <li style="margin-top: auto;">
+                <a href="{{config.client_repo_url}}" target="_blank"><i class="fa-brands fa-github fa-fw"></i> OpenBench</a>
+            </li>
+            
+            <li><a href="https://discord.gg/9MVg7fBTpM" target="_blank"><i class="fa-brands fa-discord fa-fw"></i> Discord</a></li>
         </div>
 
         <div id="content-parent">
             <div id="content" class="pb-5">
-                <div id="content-header">
-                    <button id="sidebar-toggle" onclick="toggle_sidebar()">
-                        <i class="fa-solid fa-bars fa-fw"></i>
-                    </button>
-                    <h2>
-                        <a class="site-title" href="/">OpenBench&nbsp;Testing&nbsp;Framework</a>
-                    </h2>
-                </div>
+                <div style="top: 60px"> </div>
 
                 {% if request.session.error_message %}
                     <div class="error-message">
