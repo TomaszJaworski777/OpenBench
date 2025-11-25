@@ -201,6 +201,33 @@ def getMachineStatus(username=None):
            "{0} Threads / ".format(sum([f.info['concurrency'] for f in machines])) + \
            "{0} MNPS ".format(round(sum([f.info['concurrency'] * f.mnps for f in machines]), 2))
 
+def getMachineCount(username=None):
+
+    machines = getRecentMachines()
+
+    if username != None:
+        machines = machines.filter(user__username=username)
+
+    return "{0}".format(len(machines))
+
+def getMachineConcurrency(username=None):
+
+    machines = getRecentMachines()
+
+    if username != None:
+        machines = machines.filter(user__username=username)
+
+    return "{0}".format(sum([f.info['concurrency'] for f in machines]))
+
+def getMachineSpeed(username=None):
+
+    machines = getRecentMachines()
+
+    if username != None:
+        machines = machines.filter(user__username=username)
+
+    return "{0}".format(round(sum([f.info['concurrency'] * f.mnps for f in machines]), 0))
+
 def getPaging(content, page, url, pagelen=25):
 
     start = max(0, pagelen * (page - 1))
