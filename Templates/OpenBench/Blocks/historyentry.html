@@ -208,8 +208,52 @@
             </div>
         </div>
         
-        <div class="selectable" style="height: 80px; padding: 15px; background-color: transparent !important;">
-            <span style="color: var(--color-font2);">{{ test|shortStatBlock|linebreaksbr }}</span>
+        <div class="selectable" style="height: 80px; padding: 5px 20px; background-color: transparent !important;">
+            <div class="stats-grid">
+    
+                <div class="stat-col border-right">
+                    <div class="stat-label">Elo Rating</div>
+                    <div class="stat-value highlight-elo">
+                        {{ test.elo }}
+                    </div>
+                    <div class="stat-detail">
+                        Bounds: [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]
+                    </div>
+                </div>
+
+                <div class="stat-col border-right">
+                    <div class="stat-label">LLR</div>
+                    {% if test.test_mode == "SPRT" %}
+                        <div class="stat-value">
+                            {{test.currentllr|floatformat:2}}
+                        </div>
+                        <div class="stat-detail">
+                            Bounds: [{{test.lowerllr|floatformat:2}}, {{test.upperllr|floatformat:2}}]
+                        </div>
+                    {% else %}
+                        <div class="stat-value">Fixed Games</div>
+                        <div class="stat-detail">Target: {{test.max_games}}</div>
+                    {% endif %}
+                </div>
+
+                <div class="stat-col border-right">
+                    <div class="stat-label">Games</div>
+                    <div class="stat-value">{{ test.games }}</div>
+                    <div class="stat-detail monospace">
+                        <span class="c-win">+{{ test.wins }}</span>
+                        <span class="c-draw">={{ test.draws }}</span>
+                        <span class="c-loss">-{{ test.losses }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-col wide-col">
+                    <div class="stat-label">Pentanomial [LL, LD, DD, DW, WW]</div>
+                    
+                    <div class="penta-numbers monospace">
+                        [{{ test.LL }}, {{ test.LD }}, {{ test.DD }}, {{ test.DW }}, {{ test.WW }}]
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

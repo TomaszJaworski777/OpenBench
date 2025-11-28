@@ -100,49 +100,49 @@
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function() {
+            // document.addEventListener('DOMContentLoaded', function() {
     
-                formatPage();
+            //     formatPage();
 
-                window.toggle_sidebar = function() {
-                    document.body.classList.toggle('sidebar-open');
-                }
+            //     window.toggle_sidebar = function() {
+            //         document.body.classList.toggle('sidebar-open');
+            //     }
 
-                setInterval(function() {
+            //     setInterval(function() {
 
-                    if (window.getSelection().toString().length > 0) return;
+            //         if (window.getSelection().toString().length > 0) return;
 
-                    fetch(window.location.href)
-                        .then(response => response.text())
-                        .then(html => {
-                            var parser = new DOMParser();
-                            var doc = parser.parseFromString(html, "text/html");
+            //         fetch(window.location.href)
+            //             .then(response => response.text())
+            //             .then(html => {
+            //                 var parser = new DOMParser();
+            //                 var doc = parser.parseFromString(html, "text/html");
 
-                            var newStats = doc.querySelector('.header-stats');
-                            var oldStats = document.querySelector('.header-stats');
-                            if (newStats && oldStats && newStats.innerHTML !== oldStats.innerHTML) {
-                                oldStats.innerHTML = newStats.innerHTML;
-                            }
+            //                 var newStats = doc.querySelector('.header-stats');
+            //                 var oldStats = document.querySelector('.header-stats');
+            //                 if (newStats && oldStats && newStats.innerHTML !== oldStats.innerHTML) {
+            //                     oldStats.innerHTML = newStats.innerHTML;
+            //                 }
 
-                            var newLive = doc.getElementById('live-workloads');
-                            var oldLive = document.getElementById('live-workloads');
-                            if (newLive && oldLive && newLive.innerHTML !== oldLive.innerHTML) {
-                                oldLive.innerHTML = newLive.innerHTML;
-                                formatPage();
-                            }
+            //                 var newLive = doc.getElementById('live-workloads');
+            //                 var oldLive = document.getElementById('live-workloads');
+            //                 if (newLive && oldLive && newLive.innerHTML !== oldLive.innerHTML) {
+            //                     oldLive.innerHTML = newLive.innerHTML;
+            //                     formatPage();
+            //                 }
 
-                            var newHist = doc.getElementById('history-section');
-                            var oldHist = document.getElementById('history-section');
-                            if (newHist && oldHist && newHist.innerHTML !== oldHist.innerHTML) {
-                                if (!document.querySelector('#history-section:hover')) {
-                                    oldHist.innerHTML = newHist.innerHTML;
-                                    formatPage();
-                                }
-                            }
-                        })
-                        .catch(err => console.log('Live update skipped'));
-                }, 5000);
-            }, false);
+            //                 var newHist = doc.getElementById('history-section');
+            //                 var oldHist = document.getElementById('history-section');
+            //                 if (newHist && oldHist && newHist.innerHTML !== oldHist.innerHTML) {
+            //                     if (!document.querySelector('#history-section:hover')) {
+            //                         oldHist.innerHTML = newHist.innerHTML;
+            //                         formatPage();
+            //                     }
+            //                 }
+            //             })
+            //             .catch(err => console.log('Live update skipped'));
+            //     }, 5000);
+            // }, false);
 
             document.addEventListener('DOMContentLoaded', function() {
                 

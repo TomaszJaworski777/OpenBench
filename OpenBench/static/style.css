@@ -143,14 +143,15 @@ body, html, main{
 }
 
 .digital-counter .ghost {
-    color: rgba(255, 255, 255, 0.05);
+    
+    color: rgb(205, 101, 44, 0.075);
     user-select: none;
 }
 
 .digital-counter .value {
     position: absolute;
     right: 6px;
-    color: var(--color-font1); 
+    color: var(--color-font3); 
     text-shadow: none; 
 }
 
@@ -476,18 +477,21 @@ body, html, main{
     padding: 0px;
 }
 
+#history-section {
+    width: 1300px;
+    min-width: 1300px;
+}
+
 #test-history {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    min-width: 1300px;
     gap: 10px;
 }
 
 .history-entry {
     display: flex;
     width: 100%;
-    height: 120px;
+    height: 115px;
     
     background-color: var(--color2);
     border: 2px solid var(--color3);
@@ -1061,3 +1065,65 @@ td pre {
 .icon-btn-danger:hover {
     color: #ef4444 !important; 
 }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
+    gap: 15px;
+    color: #b9bbbe;
+    font-family: 'Segoe UI';
+    font-size: 0.9rem;
+}
+
+.history-entry .stat-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.history-entry .border-right {
+    border-right: 1px solid #36393f;
+}
+
+.history-entry .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #72767d;
+    margin-bottom: 4px;
+}
+
+.history-entry .stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    font-family: monospace;
+}
+
+.history-entry .stat-sub {
+    font-size: 0.85rem;
+    color: #8e9297;
+    font-weight: 400;
+    margin-left: 5px;
+}
+
+.history-entry .stat-detail {
+    font-size: 0.8rem;
+    color: #8e9297;
+    margin-top: 2px;
+}
+
+.history-entry .monospace {
+    font-family: monospace;
+}
+
+.history-entry .c-win { color: #76D576; }
+.history-entry .c-draw { color: #EFF891; }
+.history-entry .c-loss { color: #FA9696; }
+
+.history-entry .penta-numbers {
+    color: var(--color-font1);
+    margin-bottom: 6px;
+}
+
+.history-entry .highlight-elo { color: var(--color-font3); }
