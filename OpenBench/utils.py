@@ -158,7 +158,6 @@ def extract_option(options, option):
 
 
 
-
 def get_pending_tests():
     t = Test.objects.filter(approved=False)
     t = t.exclude(finished=True)
@@ -228,7 +227,7 @@ def getMachineSpeed(username=None):
 
     return "{0}".format(int(round(sum([f.info['concurrency'] * f.mnps for f in machines]), 0)))
 
-def getPaging(content, page, url, pagelen=25):
+def getPaging(content, page, url, pagelen=9):
 
     start = max(0, pagelen * (page - 1))
     end   = min(content.count(), pagelen * page)

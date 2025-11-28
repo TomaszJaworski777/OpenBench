@@ -1,0 +1,215 @@
+{% load mytags %}
+
+{% if test.test_mode == "SPRT" %} <div class="history-entry history-entry-{{test|testResultColour}}" data-options="{{test.dev_options}}"> {% else %} <div class="history-entry" data-options="{{test.dev_options}}"> {% endif %}
+
+    <script>
+        function copy_text(test) {
+    // Elo   | 0.00 ± 0.00 (95%)
+    // SPRT  | 10.0+0.10s Threads=1 Hash=12048MB
+    // LLR   | 0.00 (-2.94, 2.94) [0.00, 5.00]
+    // Games | N: 0 W: 0 L: 0 D: 0
+    // Penta | [0, 0, 0, 0, 0]
+
+
+    //    Stockfish_16 vs Stockfish_Dev_Patch
+    // TC: 60+0.6s  |  Hash: 64MB  |  Threads: 1
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Elo     : +12.42 ± 3.8 (95%)
+    // LLR     : 4.12 (-2.94, 2.94) [0.00, 5.00]
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Games   : 7123 (51.5%)
+    // W-D-L   : +1024 =5120 -980
+    // Penta   : [20, 150, 900, 160, 25]
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //      http://localhost:8000/test/455    
+
+
+            function align_to_center(text, len=41) {
+                if ( text.length >= len ) {
+                    return text;
+                }
+
+                space_size = len - text.length;
+                modulo = " ".repeat(space_size % 2);
+                space = " ".repeat(space_size / 2);
+                return space + text + space + modulo;
+            }
+
+            function align_to_right(text, len=13) {
+                if ( text.length >= len ) {
+                    return text;
+                }
+
+                space = " ".repeat(len - text.length);
+                return space + text;
+            }
+
+            function align_to_left(text, len=13) {
+                if ( text.length >= len ) {
+                    return text;
+                }
+
+                space = " ".repeat(len - text.length);
+                return text + space;
+            }
+            
+            result = "";
+
+            switch(test.mode) {
+                case 'SPRT': {
+                    result += align_to_center(test.title) + "\n";
+                    result += align_to_left("TC: 60+0.6s", 13) + "|" + align_to_center("Hash: 64MB", 14) + "|" + align_to_right("Threads: 1", 12) + "\n";
+                    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                    break; 
+                }
+                case 'GAMES': console.log("games"); break;
+            }
+
+            result += align_to_center(window.location.origin + test.url);
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(result).then(() => {
+                    console.log("Copied!");
+                }).catch(err => console.error(err));
+            } else {
+                var area = document.createElement("textarea");
+                area.value = result;
+                document.body.append(area);
+                area.select();
+                document.execCommand("copy");
+                document.body.removeChild(area);
+            }
+        }
+    </script>
+
+    <div class="content"> 
+        
+        <div class="header"> 
+            <div class="header-content">
+                
+                <div class="h-col" style="width: 90px;">
+                    <div class="label-row">
+                        <span class="h-label">Date</span>
+                    </div>
+                    <span class="h-value" style="font-size: 0.85rem;">
+                        {{ test.updated|date:"M d, Y" }}
+                    </span>
+                </div>
+
+                <div class="h-col" style="width: 280px;"> 
+                    <div class="label-row">
+                        <span class="h-label">Test</span>
+                        <div class="mini-flags">
+                            {% if test|test_is_fischer %} <div class="flag-pill flag-frc">FRC</div> {% endif %}
+                            {% if test.error %} <div class="flag-pill flag-crash">CRASH OR ILLEGAL</div> {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="title-row">
+                        <span class="title-part" title="{{test.dev.name}}">
+                            {{test.dev.name|prettyName}}
+                        </span>
+                        <span class="title-vs">vs</span>
+                        <span class="title-part" title="{{test.base.name}}">
+                            {{test.base.name|prettyName}}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="h-col" style="width: 100px;">
+                    <div class="label-row">
+                        <span class="h-label">Author</span>
+                    </div>
+                    <span class="h-value">
+                        {{test.author|capfirst}}
+                    </span>
+                </div>
+
+                <div class="h-col" style="width: 110px;">
+                    <div class="label-row">
+                        <span class="h-label">TC</span>
+                        {% if test|test_is_time_odds %} <div class="flag-pill flag-time">TIME ODDS</div> {% endif %}
+                    </div>
+                    <span class="h-value">
+                        {{test.dev_time_control}}
+                    </span>
+                </div>
+
+                <div class="h-col" style="width: 50px;">
+                    <div class="label-row">
+                        <span class="h-label">Hash</span>
+                    </div>
+                    <span class="h-value val-Hash" style="font-size: 0.9rem;">
+                        -
+                    </span>
+                </div>
+
+                <div class="h-col" style="width: 120px;"> 
+                    <div class="label-row">
+                        <span class="h-label">Threads</span>
+                        {% if test|test_is_smp_odds %} <div class="flag-pill flag-smp">SMP ODDS</div> {% endif %}
+                    </div>
+                    <span class="h-value val-Threads" style="font-size: 0.9rem;">
+                        -
+                    </span>
+                </div>
+
+                <div class="h-col" style="width: 200px;">
+                    <div class="label-row">
+                        <span class="h-label">Book</span>
+                    </div>
+                    <span class="h-value val-Hash" style="font-size: 0.9rem;">
+                        {{test.book_name}}
+                    </span>
+                </div>
+
+                <div class="h-controls">
+                    
+                    <a href="{{test|workload_url}}" class="icon-btn" title="More Details">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+
+                    {% if test.test_mode != "SPSA" %}
+                    <div class="icon-btn" onclick="copy_text({
+                        title: '{{test.dev.name|prettyName}} vs {{test.base.name|prettyName}}',
+                        url: '{{test|workload_url}}',
+                        mode: '{{test.test_mode}}',
+                    })" title="Copy Stat Block">
+                        <i class="fa-regular fa-copy"></i>
+                    </div>
+                    {% endif %}
+
+                    <a href="{{test|gitDiffLink}}" class="icon-btn" title="View diff on GitHub" target="_blank">
+                        <i class="fa-brands fa-github"></i>
+                    </a>
+
+                    {% if test.finished and not test.passed and not test.failed %}
+                        {% if profile.approver or profile.user.username == test.author %}
+                            <a href="/{{test.workload_type_str}}/{{test.id}}/RESTART" class="icon-btn" title="Restart Test">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </a>
+                        {% endif %}
+                    {% elif not test.finished %}
+                        {% if profile.approver or profile.user.username == test.author %}
+                            <a href="/{{test.workload_type_str}}/{{test.id}}/STOP" class="icon-btn" title="Stop Test">
+                                <i class="fa-solid fa-stop"></i>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if profile.approver or profile.user.username == test.author %}
+                        <a href="/{{test.workload_type_str}}/{{test.id}}/DELETE" class="icon-btn icon-btn-danger" title="Delete Test">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="selectable" style="height: 80px; padding: 15px; background-color: transparent !important;">
+            <span style="color: var(--color-font2);">{{ test|shortStatBlock|linebreaksbr }}</span>
+        </div>
+    </div>
+</div>

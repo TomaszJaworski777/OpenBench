@@ -277,12 +277,13 @@ def index(request, page=1):
     start, end, paging = OpenBench.utils.getPaging(completed, int(page), 'index')
 
     data = {
-        'pending'   : pending,
-        'active'    : active,
-        'completed' : completed[start:end],
-        'awaiting'  : awaiting,
-        'paging'    : paging,
-        'status'    : OpenBench.utils.getMachineStatus(),
+        'pending'         : pending,
+        'active'          : active,
+        'completed_count' : len(completed),
+        'completed'       : completed[start:end],
+        'awaiting'        : awaiting,
+        'paging'          : paging,
+        'status'          : OpenBench.utils.getMachineStatus(),
     }
 
     return render(request, 'index.html', data)

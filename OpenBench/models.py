@@ -22,6 +22,7 @@ from django.db.models import CharField, IntegerField, BigIntegerField, BooleanFi
 from django.db.models import JSONField, ForeignKey, DateTimeField, OneToOneField
 from django.db.models import CASCADE, PROTECT, Model, TextChoices
 from django.contrib.auth.models import User
+from OpenBench.stats import Elo
 
 class Engine(Model):
 
@@ -194,6 +195,10 @@ class Test(Model):
 
     def workload_type_str(self):
         return {'SPSA' : 'tune', 'DATAGEN' : 'datagen'}.get(self.test_mode, 'test')
+
+    def elo(self):
+        (min, elo, max) = Elo(self.as_tri())
+        return '{0} ± {1}'.format(round(elo, 1), round(abs(elo - min), 1))
 
 class LogEvent(Model):
 

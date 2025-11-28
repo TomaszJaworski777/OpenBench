@@ -4,65 +4,67 @@
 
 {% block content %}
 
-    <table class="test-list stripes hoverable">
+    {% if pending %}
+        <div class="workload-heading">
+            Pending
+        </div>
+        
+        <table class="test-list stripes hoverable">
+            {% for test in pending %}
+                <tr>
+                    {% include "OpenBench/Blocks/testsummary.html" %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 
-        <!-- Only show Pending tests for the front page of the Index -->
-        {% if paging.page == 1 %}
+    {% if awaiting %}
+        <div class="workload-heading">
+            Awaiting Artifacts
+        </div>
 
-            <!-- Currently Pending tests (Waiting to be approved) -->
-            {% if pending %}
-                <tr class="table-header"><th colspan='6'>Pending</th></tr>
-                {% for test in pending %}
-                    <tr>
-                        {% include "OpenBench/Blocks/testsummary.html" %}
-                    </tr>
-                {% endfor %}
-                <tr class="table-spacer"><th colspan='6'></th></tr>
-            {% endif %}
+        <table class="test-list stripes hoverable">
+            {% for test in awaiting %}
+                <tr>
+                    {% include "OpenBench/Blocks/testsummary.html" %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 
-            <!-- Currently Awaiting tests (Waiting for Artifacts) -->
-            {% if awaiting %}
-                <tr class="table-header"><th colspan='6'>Awaiting Artifacts</th></tr>
-                {% for test in awaiting %}
-                    <tr>
-                        {% include "OpenBench/Blocks/testsummary.html" %}
-                    </tr>
-                {% endfor %}
-                <tr class="table-spacer"><th colspan='6'></th></tr>
-            {% endif %}
+    {% if active %}
+        <table class="test-list stripes hoverable" style="margin-bottom: 40px;">
+            {% for test in active %}
+                {% with prev_test=active|previous:forloop.counter0 %}
+                    {% if prev_test and prev_test.priority != test.priority %}
+                        <tr class="table-spacer-small"><th colspan='6'></th></tr>
+                        <tr class="table-spacer-small"><th colspan='6'></th></tr>
+                    {% endif %}
+                {% endwith %}
 
-            <!-- Currently Running tests (Waiting to be completed) -->
-            {% if active %}
-                <tr class="table-header"><th colspan='6'>Active {{status}}</th></tr>
-                {% for test in active %}
+                <tr>
+                    {% include "OpenBench/Blocks/testsummary.html" %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 
-                    <!-- Add two empty rows ( for the colouring scheme ) when changing prio -->
-                    {% with prev_test=active|previous:forloop.counter0 %}
-                        {% if prev_test and prev_test.priority != test.priority %}
-                            <tr class="table-spacer-small"><th colspan='6'></th></tr>
-                            <tr class="table-spacer-small"><th colspan='6'></th></tr>
-                        {% endif %}
-                    {% endwith %}
+    <div id="history-section">
+        
+        <div class="workload-heading">
+            Test History 
+            <span style="color: var(--color-font2); margin-left: 10px; font-size: 0.7em; opacity: 0.7;">
+                [{{completed_count}}]
+            </span>
+        </div>
 
-                    <tr>
-                        {% include "OpenBench/Blocks/testsummary.html" %}
-                    </tr>
-                {% endfor %}
-                <tr class="table-spacer"><th colspan='6'></th></tr>
-            {% endif %}
+        <div id="test-history">
+            {% for test in completed %}
+                {% include "OpenBench/Blocks/historyentry.html" %}
+            {% endfor %}
+        </div>
 
-        {% endif %}
-
-        <!-- Tests which have already finished -->
-        <tr class="table-header"><th colspan='6'>Finished</th></tr>
-        {% for test in completed %}
-            <tr>
-                {% include "OpenBench/Blocks/testsummary.html" %}
-            </tr>
-        {% endfor %}
-
-    </table>
-
-    {% include "OpenBench/Blocks/pagebrowser.html" %}
+        {% include "OpenBench/Blocks/pagebrowser.html" %}
+    </div>
 
 {% endblock %}

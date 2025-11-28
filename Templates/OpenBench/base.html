@@ -26,7 +26,7 @@
         {% endblock %}
 
         <script>
-            function formatTimestamps() {
+            function formatPage() {
                 var timestamps = document.getElementsByClassName('timestamp');
                 var timeOptions = {
                     year : 'numeric', month : '2-digit', day : '2-digit', 
@@ -37,7 +37,7 @@
                     if (!timestamps[i].dataset.formatted) { 
                         var date = new Date(1000 * timestamps[i].textContent);
                         timestamps[i].textContent = date.toLocaleString(undefined, timeOptions);
-                        timestamps[i].dataset.formatted = "true"; // Mark as done
+                        timestamps[i].dataset.formatted = "true";
                     }
                 }
 
@@ -54,14 +54,13 @@
                 const cells = document.querySelectorAll('.engine-options');
                 cells.forEach(cell => {
                     if (cell.dataset.formatted) return;
-                    
                     if (cell.textContent.split(/\s+/).length <= 2) return;
 
                     const re_threads = (cell.textContent.match(/Threads=\d+/) || [''])[0];
                     const re_hash    = (cell.textContent.match(/Hash=\d+/) || [''])[0];
                     
                     if(re_threads && re_hash) {
-                        const new_text   = re_threads + ' ' + re_hash + ' ...';
+                        const new_text = re_threads + ' ' + re_hash + ' ...';
                         const popup = document.createElement('div');
                         popup.classList.add('engine-options-popup');
                         popup.innerHTML = cell.textContent.trim().replace(/\s+/g, '<br>');
@@ -70,17 +69,49 @@
                         cell.dataset.formatted = "true";
                     }
                 });
+
+                const entries = document.querySelectorAll('.history-entry');
+
+                entries.forEach(entry => {
+                    const rawString = entry.getAttribute('data-options');
+                    
+                    if (!rawString) return;
+
+                    const pairs = rawString.split(' ');
+
+                    pairs.forEach(pair => {
+                        const [key, value] = pair.split('=');
+
+                        const targetSpan = entry.querySelector(`.val-${key}`);
+
+                        if (targetSpan) {
+                            if(key == "Hash") {
+                                if(parseInt(value) > 1024) {
+                                    targetSpan.textContent = (parseInt(value) / 1024).toFixed(1) + "GB";
+                                    return;
+                                }
+                                targetSpan.textContent = value + "MB";
+                                return;
+                            }
+
+                            targetSpan.textContent = value;
+                        }
+                    });
+                });
             }
 
             document.addEventListener('DOMContentLoaded', function() {
-                
-                formatTimestamps();
+    
+                formatPage();
 
                 window.toggle_sidebar = function() {
                     document.body.classList.toggle('sidebar-open');
                 }
 
                 setInterval(function() {
+
+                    if (window.getSelection().toString().length > 0) return;
+
                     fetch(window.location.href)
                         .then(response => response.text())
                         .then(html => {
@@ -89,21 +120,71 @@
 
                             var newStats = doc.querySelector('.header-stats');
                             var oldStats = document.querySelector('.header-stats');
-                            if (newStats && oldStats) {
-                                if (newStats.innerHTML !== oldStats.innerHTML) {
-                                    oldStats.innerHTML = newStats.innerHTML;
-                                }
+                            if (newStats && oldStats && newStats.innerHTML !== oldStats.innerHTML) {
+                                oldStats.innerHTML = newStats.innerHTML;
                             }
 
-                            var newTable = doc.querySelector('.test-list');
-                            var oldTable = document.querySelector('.test-list');
-                            if (newTable && oldTable) {
-                                oldTable.innerHTML = newTable.innerHTML;
-                                formatTimestamps(); 
+                            var newLive = doc.getElementById('live-workloads');
+                            var oldLive = document.getElementById('live-workloads');
+                            if (newLive && oldLive && newLive.innerHTML !== oldLive.innerHTML) {
+                                oldLive.innerHTML = newLive.innerHTML;
+                                formatPage();
+                            }
+
+                            var newHist = doc.getElementById('history-section');
+                            var oldHist = document.getElementById('history-section');
+                            if (newHist && oldHist && newHist.innerHTML !== oldHist.innerHTML) {
+                                if (!document.querySelector('#history-section:hover')) {
+                                    oldHist.innerHTML = newHist.innerHTML;
+                                    formatPage();
+                                }
                             }
                         })
-                        .catch(err => console.log('Update skipped:', err));
-                }, 1000);
+                        .catch(err => console.log('Live update skipped'));
+                }, 5000);
+            }, false);
+
+            document.addEventListener('DOMContentLoaded', function() {
+                
+                formatPage();
+
+                function loadPage(url) {
+                    const contentDiv = document.getElementById('content');
+                    contentDiv.style.opacity = '0.5';
+
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            
+                            const newContent = doc.getElementById('content').innerHTML;
+                            
+                            contentDiv.innerHTML = newContent;
+                            contentDiv.style.opacity = '1';
+                            
+                            window.history.pushState({path: url}, '', url);
+
+                            formatPage();
+                        })
+                        .catch(err => {
+                            console.error('Failed to load page:', err);
+                            window.location.href = url;
+                        });
+                }
+
+                document.body.addEventListener('click', function(e) {
+                    const link = e.target.closest('#pagebrowse a.page');
+                    
+                    if (link) {
+                        e.preventDefault();
+                        loadPage(link.href);
+                    }
+                });
+
+                window.addEventListener('popstate', function() {
+                    window.location.reload();
+                });
 
             }, false);
         </script>
@@ -177,6 +258,8 @@
         </div>
 
         <div id="sidebar">
+            <div style="height: 20px;"></div>
+
             <li class="{% if '/index' in request.path or request.path == '/' %}active{% endif %}">
                 <a href="/index"><i class="fa-solid fa-table-columns fa-fw"></i> Dashboard</a>
             </li>
@@ -219,9 +302,7 @@
         </div>
 
         <div id="content-parent">
-            <div id="content" class="pb-5">
-                <div style="top: 60px"> </div>
-
+            <div id="content">
                 {% if request.session.error_message %}
                     <div class="error-message">
                         <pre>{{request.session.error_message}}</pre>
@@ -231,12 +312,6 @@
                 {% if request.session.warning_message %}
                     <div class="warning-message">
                         <pre>{{request.session.warning_message}}</pre>
-                    </div>
-                {% endif %}
-
-                {% if request.session.status_message %}
-                    <div class="status-message">
-                        <pre>{{request.session.status_message}}</pre>
                     </div>
                 {% endif %}
 
