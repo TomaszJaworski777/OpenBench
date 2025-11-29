@@ -15,7 +15,6 @@ a:link, a:visited, a:hover, a:active {
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
-    cursor: text;
 }
 
 body {
@@ -1073,6 +1072,7 @@ td pre {
     color: #b9bbbe;
     font-family: 'Segoe UI';
     font-size: 0.9rem;
+    margin-top: 2px;
 }
 
 .history-entry .stat-col {

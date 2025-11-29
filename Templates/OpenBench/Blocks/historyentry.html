@@ -23,8 +23,7 @@
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     //      http://localhost:8000/test/455    
 
-
-            function align_to_center(text, len=41) {
+            function align_to_center(text, len=44) {
                 if ( text.length >= len ) {
                     return text;
                 }
@@ -44,7 +43,7 @@
                 return space + text;
             }
 
-            function align_to_left(text, len=13) {
+            function align_to_left(text, len=16) {
                 if ( text.length >= len ) {
                     return text;
                 }
@@ -52,19 +51,56 @@
                 space = " ".repeat(len - text.length);
                 return text + space;
             }
-            
+
+            const pairs = test.options.split(' ');
+            hash = "";
+            threads = "";
+
+            pairs.forEach(pair => {
+                const [key, value] = pair.split('=');
+
+                if(key == "Hash") {
+                    if(parseInt(value) > 1024) {
+                        hash = (parseInt(value) / 1024).toFixed(1) + "GB";
+                        return;
+                    }
+                    hash = value + "MB";
+                    return;
+                }
+
+                if(key == "Threads") { 
+                    threads = value;
+                }
+            });
+
             result = "";
+
+            result += align_to_center(test.title) + "\n";
+            result += align_to_left("TC: " + test.tc + "s", 16) + "|" + align_to_center("Hash: " + hash, 14) + "|" + align_to_right("Threads: " + threads, 12) + "\n";
+            result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
             switch(test.mode) {
                 case 'SPRT': {
-                    result += align_to_center(test.title) + "\n";
-                    result += align_to_left("TC: 60+0.6s", 13) + "|" + align_to_center("Hash: 64MB", 14) + "|" + align_to_right("Threads: 1", 12) + "\n";
-                    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                    result += "Elo     : " + test.elo + " (95%)\n";
+                    result += "LLR     : " + test.llr + "\n";
+                    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                    wr = (100 * parseInt(test.w) / (parseInt(test.w) + parseInt(test.l))).toFixed(1);
+                    result += "Games   : " + test.games + " (" + wr + "%)\n";
+                    result += "W-D-L   : +" + test.w + " =" + test.d + " -" + test.l + "\n";
+                    result += "Penta   : " + test.penta + "\n";
                     break; 
                 }
-                case 'GAMES': console.log("games"); break;
+                case 'GAMES': {
+                    result += "Elo     : " + test.elo + " (95%)\n";
+                    wr = (100 * parseInt(test.w) / (parseInt(test.w) + parseInt(test.l))).toFixed(1);
+                    result += "Games   : " + test.games + " / " + test.max_games + " (" + wr + "%)\n";
+                    result += "W-D-L   : +" + test.w + " =" + test.d + " -" + test.l + "\n";
+                    result += "Penta   : " + test.penta + "\n";
+                    break;
+                }
             }
 
+            result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             result += align_to_center(window.location.origin + test.url);
 
             if (navigator.clipboard && window.isSecureContext) {
@@ -105,15 +141,21 @@
                         </div>
                     </div>
                     
-                    <div class="title-row">
-                        <span class="title-part" title="{{test.dev.name}}">
+                    {% if test.test_mode != "SPSA" %}
+                        <div class="title-row">
+                            <span class="title-part" title="{{test.dev.name}}">
+                                {{test.dev.name|prettyName}}
+                            </span>
+                            <span class="title-vs">vs</span>
+                            <span class="title-part" title="{{test.base.name}}">
+                                {{test.base.name|prettyName}}
+                            </span>
+                        </div>
+                    {% else %}
+                        <span class="h-value title-part" style="font-size: 0.85rem;">
                             {{test.dev.name|prettyName}}
                         </span>
-                        <span class="title-vs">vs</span>
-                        <span class="title-part" title="{{test.base.name}}">
-                            {{test.base.name|prettyName}}
-                        </span>
-                    </div>
+                    {% endif %}
                 </div>
 
                 <div class="h-col" style="width: 100px;">
@@ -174,6 +216,16 @@
                         title: '{{test.dev.name|prettyName}} vs {{test.base.name|prettyName}}',
                         url: '{{test|workload_url}}',
                         mode: '{{test.test_mode}}',
+                        elo: '{{test.elo}}',
+                        tc: '{{test.dev_time_control}}',
+                        options: '{{test.dev_options}}',
+                        llr: '{{test.currentllr|floatformat:2}} ({{test.lowerllr|floatformat:2}}, {{test.upperllr|floatformat:2}}) [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]',
+                        games: '{{test.games}}',
+                        max_games: '{{test.max_games}}',
+                        w: '{{test.wins}}',
+                        d: '{{test.draws}}',
+                        l: '{{test.losses}}',
+                        penta: '[{{ test.LL }}, {{ test.LD }}, {{ test.DD }}, {{ test.DW }}, {{ test.WW }}]'
                     })" title="Copy Stat Block">
                         <i class="fa-regular fa-copy"></i>
                     </div>
@@ -208,52 +260,118 @@
             </div>
         </div>
         
-        <div class="selectable" style="height: 80px; padding: 5px 20px; background-color: transparent !important;">
-            <div class="stats-grid">
-    
-                <div class="stat-col border-right">
-                    <div class="stat-label">Elo Rating</div>
-                    <div class="stat-value highlight-elo">
-                        {{ test.elo }}
+        <div style="height: 80px; padding: 5px 20px; background-color: transparent !important;">
+            
+            {% if test.test_mode == "SPSA" %}
+                <div class="stats-grid" style="grid-template-columns: 1fr 1fr 3.5fr;">
+                    
+                    <div class="stat-col border-right" style="height: 65px; width: 269px;">
+                        <div class="stat-label">Iterations</div>
+                        <div class="stat-value">
+                            {{ test.spsa_iterations_done }} <span class="stat-sub">/ {{ test.spsa.iterations }}</span>
+                        </div>
                     </div>
-                    <div class="stat-detail">
-                        Bounds: [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]
+
+                    <div class="stat-col border-right" style="width: 269px;">
+                        <div class="stat-label">Games</div>
+                        <div class="stat-value">
+                            {{ test.games }} <span class="stat-sub">/ {{ test.spsa_game_target }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-col">
+                        <div class="stat-label">SPSA Parameters</div>
+                        <div class="stat-detail monospace" style="display: grid; grid-template-columns: repeat(4, max-content); gap: 3px 15px; color: #8e9297;">
+                            
+                            <span>A: <span style="color: #D6D6D4;">{{ test.spsa.A }}</span></span>
+                            <span>&alpha;: <span style="color: #D6D6D4;">{{ test.spsa.Alpha }}</span></span>
+                            <span>&gamma;: <span style="color: #D6D6D4;">{{ test.spsa.Gamma }}</span></span>
+                            <span>Ratio: <span style="color: #D6D6D4;">{{ test.spsa.A_ratio }}</span></span>
+
+                            <span>Pairs: <span style="color: #D6D6D4;">{{ test.spsa.pairs_per }}</span></span>
+                            <span>Dist: <span style="color: #D6D6D4;">{{ test.spsa.distribution_type }}</span></span>
+                            <span>Rep: <span style="color: #D6D6D4;">{{ test.spsa.reporting_type }}</span></span>
+
+                        </div>
                     </div>
                 </div>
 
-                <div class="stat-col border-right">
-                    <div class="stat-label">LLR</div>
-                    {% if test.test_mode == "SPRT" %}
+            {% elif test.test_mode == "GAMES" %}
+                <div class="stats-grid" style="grid-template-columns: 1fr 1.5fr 1.5fr;">
+                    
+                    <div class="stat-col border-right">
+                        <div class="stat-label">Elo Rating</div>
+                        <div class="stat-value highlight-elo">
+                            {{ test.elo }}
+                        </div>
+                        <div class="stat-detail">
+                            Bounds: [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]
+                        </div>
+                    </div>
+
+                    <div class="stat-col border-right">
+                        <div class="stat-label">Games Progress</div>
+                        <div class="stat-value">
+                            {{ test.games }} <span class="stat-sub">/ {{ test.max_games }}</span>
+                        </div>
+                        <div class="stat-detail monospace">
+                            <span class="c-win">+{{ test.wins }}</span>
+                            <span class="c-draw">={{ test.draws }}</span>
+                            <span class="c-loss">-{{ test.losses }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-col wide-col">
+                        <div class="stat-label">Pentanomial [LL, LD, DD, DW, WW]</div>
+                        <div class="penta-numbers monospace">
+                            [{{ test.LL }}, {{ test.LD }}, {{ test.DD }}, {{ test.DW }}, {{ test.WW }}]
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="stats-grid">
+    
+                    <div class="stat-col border-right">
+                        <div class="stat-label">Elo Rating</div>
+                        <div class="stat-value highlight-elo">
+                            {{ test.elo }}
+                        </div>
+                        <div class="stat-detail">
+                            Bounds: [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]
+                        </div>
+                    </div>
+
+                    <div class="stat-col border-right">
+                        <div class="stat-label">LLR</div>
                         <div class="stat-value">
                             {{test.currentllr|floatformat:2}}
                         </div>
                         <div class="stat-detail">
                             Bounds: [{{test.lowerllr|floatformat:2}}, {{test.upperllr|floatformat:2}}]
                         </div>
-                    {% else %}
-                        <div class="stat-value">Fixed Games</div>
-                        <div class="stat-detail">Target: {{test.max_games}}</div>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <div class="stat-col border-right">
-                    <div class="stat-label">Games</div>
-                    <div class="stat-value">{{ test.games }}</div>
-                    <div class="stat-detail monospace">
-                        <span class="c-win">+{{ test.wins }}</span>
-                        <span class="c-draw">={{ test.draws }}</span>
-                        <span class="c-loss">-{{ test.losses }}</span>
+                    <div class="stat-col border-right">
+                        <div class="stat-label">Games</div>
+                        <div class="stat-value">{{ test.games }}</div>
+                        <div class="stat-detail monospace">
+                            <span class="c-win">+{{ test.wins }}</span>
+                            <span class="c-draw">={{ test.draws }}</span>
+                            <span class="c-loss">-{{ test.losses }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-col wide-col">
+                        <div class="stat-label">Pentanomial [LL, LD, DD, DW, WW]</div>
+                        
+                        <div class="penta-numbers monospace">
+                            [{{ test.LL }}, {{ test.LD }}, {{ test.DD }}, {{ test.DW }}, {{ test.WW }}]
+                        </div>
                     </div>
                 </div>
+            {% endif %}
 
-                <div class="stat-col wide-col">
-                    <div class="stat-label">Pentanomial [LL, LD, DD, DW, WW]</div>
-                    
-                    <div class="penta-numbers monospace">
-                        [{{ test.LL }}, {{ test.LD }}, {{ test.DD }}, {{ test.DW }}, {{ test.WW }}]
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

@@ -200,6 +200,12 @@ class Test(Model):
         (min, elo, max) = Elo(self.as_tri())
         return '{0} ± {1}'.format(round(elo, 1), round(abs(elo - min), 1))
 
+    def spsa_iterations_done(self):
+        return int(self.games / (self.spsa['pairs_per'] * 2))
+
+    def spsa_game_target(self):
+        return int(self.spsa['iterations'] * self.spsa['pairs_per'] * 2)
+
 class LogEvent(Model):
 
     author     = CharField(max_length=128) # Username for the OpenBench Profile
