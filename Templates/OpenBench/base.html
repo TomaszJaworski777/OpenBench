@@ -98,6 +98,26 @@
                         }
                     });
                 });
+
+                const charts = document.querySelectorAll('.penta-graph-container');
+        
+                charts.forEach(container => {
+                    const cols = container.querySelectorAll('.penta-col');
+                    // Extract values
+                    const values = Array.from(cols).map(col => parseInt(col.getAttribute('data-val') || 0));
+                    // Calculate Maximum
+                    const max = Math.max(...values);
+                    
+                    // Apply Heights
+                    if (max > 0) {
+                        cols.forEach((col, index) => {
+                            const bar = col.querySelector('.penta-bar');
+                            // Calculate percentage relative to the highest column
+                            const percentage = (values[index] / max) * 100;
+                            bar.style.height = percentage + "%";
+                        });
+                    }
+                });
             }
 
             // document.addEventListener('DOMContentLoaded', function() {

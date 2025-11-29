@@ -14,13 +14,11 @@
             Pending
         </div>
         
-        <table class="test-list stripes hoverable">
+        <div class="test-grid">
             {% for test in pending %}
-                <tr>
-                    {% include "OpenBench/Blocks/testsummary.html" %}
-                </tr>
+                {% include "OpenBench/Blocks/testsummary.html" %}
             {% endfor %}
-        </table>
+        </div>
     {% endif %}
 
     {% if awaiting %}
@@ -28,34 +26,24 @@
             Awaiting Artifacts
         </div>
 
-        <table class="test-list stripes hoverable">
+        <div class="test-grid">
             {% for test in awaiting %}
-                <tr>
-                    {% include "OpenBench/Blocks/testsummary.html" %}
-                </tr>
+                {% include "OpenBench/Blocks/testsummary.html" %}
             {% endfor %}
-        </table>
+        </div>
     {% endif %}
 
     {% if active %}
-        <table class="test-list stripes hoverable" style="margin-bottom: 40px;">
+        <div class="test-grid" style="margin-bottom: 40px;">
             {% for test in active %}
-                {% with prev_test=active|previous:forloop.counter0 %}
-                    {% if prev_test and prev_test.priority != test.priority %}
-                        <tr class="table-spacer-small"><th colspan='6'></th></tr>
-                        <tr class="table-spacer-small"><th colspan='6'></th></tr>
-                    {% endif %}
-                {% endwith %}
-
-                <tr>
-                    {% include "OpenBench/Blocks/testsummary.html" %}
-                </tr>
+                
+                {% include "OpenBench/Blocks/testsummary.html" %}
+                
             {% endfor %}
-        </table>
+        </div>
     {% endif %}
 
     <div id="history-section">
-        
         <div class="workload-heading">
             Test History 
             <span style="color: var(--color-font2); margin-left: 10px; font-size: 0.7em; opacity: 0.7;">
