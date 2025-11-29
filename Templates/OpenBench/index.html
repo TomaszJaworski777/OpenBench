@@ -1,6 +1,11 @@
 {% extends "OpenBench/base.html" %}
 
 {% load mytags %}
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static 'copy_text.js' %}?{{ static_version }}"></script>
+{% endblock %}
 
 {% block content %}
 

@@ -1,123 +1,6 @@
 {% load mytags %}
 
 {% if test.test_mode == "SPRT" %} <div class="history-entry history-entry-{{test|testResultColour}}" data-options="{{test.dev_options}}"> {% else %} <div class="history-entry" data-options="{{test.dev_options}}"> {% endif %}
-
-    <script>
-        function copy_text(test) {
-    // Elo   | 0.00 ± 0.00 (95%)
-    // SPRT  | 10.0+0.10s Threads=1 Hash=12048MB
-    // LLR   | 0.00 (-2.94, 2.94) [0.00, 5.00]
-    // Games | N: 0 W: 0 L: 0 D: 0
-    // Penta | [0, 0, 0, 0, 0]
-
-
-    //    Stockfish_16 vs Stockfish_Dev_Patch
-    // TC: 60+0.6s  |  Hash: 64MB  |  Threads: 1
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // Elo     : +12.42 ± 3.8 (95%)
-    // LLR     : 4.12 (-2.94, 2.94) [0.00, 5.00]
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // Games   : 7123 (51.5%)
-    // W-D-L   : +1024 =5120 -980
-    // Penta   : [20, 150, 900, 160, 25]
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    //      http://localhost:8000/test/455    
-
-            function align_to_center(text, len=44) {
-                if ( text.length >= len ) {
-                    return text;
-                }
-
-                space_size = len - text.length;
-                modulo = " ".repeat(space_size % 2);
-                space = " ".repeat(space_size / 2);
-                return space + text + space + modulo;
-            }
-
-            function align_to_right(text, len=13) {
-                if ( text.length >= len ) {
-                    return text;
-                }
-
-                space = " ".repeat(len - text.length);
-                return space + text;
-            }
-
-            function align_to_left(text, len=16) {
-                if ( text.length >= len ) {
-                    return text;
-                }
-
-                space = " ".repeat(len - text.length);
-                return text + space;
-            }
-
-            const pairs = test.options.split(' ');
-            hash = "";
-            threads = "";
-
-            pairs.forEach(pair => {
-                const [key, value] = pair.split('=');
-
-                if(key == "Hash") {
-                    if(parseInt(value) > 1024) {
-                        hash = (parseInt(value) / 1024).toFixed(1) + "GB";
-                        return;
-                    }
-                    hash = value + "MB";
-                    return;
-                }
-
-                if(key == "Threads") { 
-                    threads = value;
-                }
-            });
-
-            result = "";
-
-            result += align_to_center(test.title) + "\n";
-            result += align_to_left("TC: " + test.tc + "s", 16) + "|" + align_to_center("Hash: " + hash, 14) + "|" + align_to_right("Threads: " + threads, 12) + "\n";
-            result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-
-            switch(test.mode) {
-                case 'SPRT': {
-                    result += "Elo     : " + test.elo + " (95%)\n";
-                    result += "LLR     : " + test.llr + "\n";
-                    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-                    wr = (100 * parseInt(test.w) / (parseInt(test.w) + parseInt(test.l))).toFixed(1);
-                    result += "Games   : " + test.games + " (" + wr + "%)\n";
-                    result += "W-D-L   : +" + test.w + " =" + test.d + " -" + test.l + "\n";
-                    result += "Penta   : " + test.penta + "\n";
-                    break; 
-                }
-                case 'GAMES': {
-                    result += "Elo     : " + test.elo + " (95%)\n";
-                    wr = (100 * parseInt(test.w) / (parseInt(test.w) + parseInt(test.l))).toFixed(1);
-                    result += "Games   : " + test.games + " / " + test.max_games + " (" + wr + "%)\n";
-                    result += "W-D-L   : +" + test.w + " =" + test.d + " -" + test.l + "\n";
-                    result += "Penta   : " + test.penta + "\n";
-                    break;
-                }
-            }
-
-            result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-            result += align_to_center(window.location.origin + test.url);
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(result).then(() => {
-                    console.log("Copied!");
-                }).catch(err => console.error(err));
-            } else {
-                var area = document.createElement("textarea");
-                area.value = result;
-                document.body.append(area);
-                area.select();
-                document.execCommand("copy");
-                document.body.removeChild(area);
-            }
-        }
-    </script>
-
     <div class="content"> 
         
         <div class="header"> 
@@ -212,7 +95,7 @@
                     </a>
 
                     {% if test.test_mode != "SPSA" %}
-                    <div class="icon-btn" onclick="copy_text({
+                    <div class="icon-btn" onclick="copy_text_from_test({
                         title: '{{test.dev.name|prettyName}} vs {{test.base.name|prettyName}}',
                         url: '{{test|workload_url}}',
                         mode: '{{test.test_mode}}',
