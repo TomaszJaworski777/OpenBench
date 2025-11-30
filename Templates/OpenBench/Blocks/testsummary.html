@@ -1,7 +1,208 @@
 {% load mytags %}
 
-<div class="test-card">
-    
+<div class="test-card data-options" data-options="{{test.dev_options}}">
+    <div class="content" style="height: 100%; display: flex; flex-direction: column;"> 
+        <div class="card-header"> 
+            <div class="header-content"> 
+                
+                <div class="header-row-top">
+                    {% if test.test_mode != "GAMES" %}
+                        <span class="field-label">{{test.test_mode}}</span>
+                    {% else %}
+                        <span class="field-label">{{test.max_games}} GAMES</span>
+                    {% endif %}
+                    <div class="action-buttons">
+                        <a href="{{test|workload_url}}" class="icon-btn" title="More Details">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                        {% if test.test_mode != "SPSA" %}
+                        <div class="icon-btn" onclick="copy_text_from_test({
+                            title: '{{test.dev.name|prettyName}} vs {{test.base.name|prettyName}}',
+                            url: '{{test|workload_url}}',
+                            mode: '{{test.test_mode}}',
+                            elo: '{{test.elo}}',
+                            tc: '{{test.dev_time_control}}',
+                            options: '{{test.dev_options}}',
+                            llr: '{{test.currentllr|floatformat:2}} ({{test.lowerllr|floatformat:2}}, {{test.upperllr|floatformat:2}}) [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]',
+                            games: '{{test.games}}',
+                            max_games: '{{test.max_games}}',
+                            w: '{{test.wins}}',
+                            d: '{{test.draws}}',
+                            l: '{{test.losses}}',
+                            penta: '[{{ test.LL }}, {{ test.LD }}, {{ test.DD }}, {{ test.DW }}, {{ test.WW }}]'
+                        })" title="Copy Stat Block">
+                            <i class="fa-regular fa-copy"></i>
+                        </div>
+                        {% endif %}
+                        <a href="{{test|gitDiffLink}}" class="icon-btn" title="View diff on GitHub" target="_blank">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        
+                        {% if profile.approver or profile.user.username == test.author %}
+                            <a href="/{{test.workload_type_str}}/{{test.id}}/STOP" class="icon-btn icon-btn-danger" title="Stop Test">
+                                <i class="fa-solid fa-stop"></i>
+                            </a>
+                        {% endif %}
 
+                        {% if profile.approver or profile.user.username == test.author %}
+                            <a href="/{{test.workload_type_str}}/{{test.id}}/DELETE" class="icon-btn icon-btn-danger" title="Delete Test">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
 
+                <div class="header-row-main" style="margin-top: -3px;">
+                    <div class="name-group">
+                        <div class="label-row">
+                            <span class="field-label">Test</span>
+                            <div class="mini-flags">
+                                {% if test|test_is_fischer %} <div class="flag-pill flag-frc">FRC</div> {% endif %}
+                                {% if test.error %} <div class="flag-pill flag-crash">CRASH OR ILLEGAL</div> {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if test.test_mode != "SPSA" %}
+                            <div class="title-row">
+                                <span class="test-name" title="{{test.dev.name}}">{{test.dev.name|prettyName}}</span>
+                                <span class="title-vs">vs</span>
+                                <span class="test-name" title="{{test.base.name}}">{{test.base.name|prettyName}}</span>
+                            </div>
+                        {% else %}
+                            <span class="field-value test-name test-name-spsa">{{test.dev.name|prettyName}}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="info-col author-col">
+                        <div class="label-row"><span class="field-label">Author</span></div>
+                        <span class="field-value">{{test.author|capfirst}}</span>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    
+                    <div class="info-col col-tc">
+                        <div class="label-row">
+                            <span class="field-label">TC</span>
+                            {% if test|test_is_time_odds %} <div class="flag-pill flag-time">TIME ODDS</div> {% endif %}
+                        </div>
+                        <span class="field-value">{{test.dev_time_control}}</span>
+                    </div>
+
+                    <div class="info-col col-hash">
+                        <div class="label-row"><span class="field-label">Hash</span></div>
+                        <span class="field-value val-Hash">-</span>
+                    </div>
+
+                    <div class="info-col col-threads">
+                        <div class="label-row">
+                            <span class="field-label">Threads</span>
+                            {% if test|test_is_smp_odds %} <div class="flag-pill flag-smp">SMP ODDS</div> {% endif %}
+                        </div>
+                        <span class="field-value val-Threads">-</span>
+                    </div>
+
+                    <div class="info-col col-book">
+                        <div class="label-row"><span class="field-label">Book</span></div>
+                        <span class="field-value val-book">{{test.book_name}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="body" style="display: flex; flex-direction: column; flex: 1; height: auto;  font-family: 'Segoe UI';">
+            {% if test.test_mode == "SPRT" %}
+
+                <div style="font-family: 'Segoe UI';">
+
+                    <div class="section text-center">
+                        <div class="label">Elo Rating</div>
+                        <div class="elo-value text-mono dynamic-color" data-percentage="{{test.lrr_percentage}}">
+                            {{test.elo}}
+                        </div>
+                        <div class="sub-label text-mono">
+                            Bounds: [{{test.elolower}}, {{test.eloupper}}]
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="llr-header">
+                            <span class="c-fail" style="font-weight:600;">Fail</span>
+                            <span class="text-mono" style="color: #fff;">LLR: {{test.currentllr|floatformat:2}}</span>
+                            <span class="c-pass" style="font-weight:600;">Pass</span>
+                        </div>
+                        
+                        <div class="llr-bar-container">
+                            <div class="llr-marker" style="left: {{test.lrr_percentage}}%;"></div>
+                            <div class="llr-gradient"></div>
+                        </div>
+
+                        <div class="llr-bounds">
+                            <span>{{test.lowerllr|floatformat:2}}</span>
+                            <span>0.00</span>
+                            <span>{{test.upperllr|floatformat:2}}</span>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="games-grid">
+                            
+                            <div class="stat-block">
+                                <span class="label">Games</span>
+                                <span class="text-mono" style="font-size: 1.2rem; color: #fff;">
+                                    {{test.games}}
+                                </span>
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <div class="stat-block">
+                                <span class="label">Win / Draw / Loss</span>
+                                <div class="wdl-values text-mono">
+                                    <span class="c-win">+{{test.wins}}</span>
+                                    <span class="c-draw">={{test.draws}}</span>
+                                    <span class="c-loss">-{{test.losses}}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="label text-center">Pentanomial Distribution</div>
+                        
+                        <div class="penta-graph-container" style="margin-top: 15px; height: 55px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #3f4147;">
+                            <div class="penta-col" data-val="{{ test.LL }}"><div class="penta-bar bar-ll"></div></div>
+                            <div class="penta-col" data-val="{{ test.LD }}"><div class="penta-bar bar-ld"></div></div>
+                            <div class="penta-col" data-val="{{ test.DD }}"><div class="penta-bar bar-dd"></div></div>
+                            <div class="penta-col" data-val="{{ test.DW }}"><div class="penta-bar bar-dw"></div></div>
+                            <div class="penta-col" data-val="{{ test.WW }}"><div class="penta-bar bar-ww"></div></div>
+                        </div>
+
+                        <div class="penta-numbers">
+                            <span class="penta-num">{{test.LL}}</span>
+                            <span class="penta-num">{{test.LD}}</span>
+                            <span class="penta-num">{{test.DD}}</span>
+                            <span class="penta-num">{{test.DW}}</span>
+                            <span class="penta-num">{{test.WW}}</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            {% elif test.test_mode == "SPSA" %}
+                 <div style="display:flex; align-items:center; justify-content:center; height:100%; color: var(--color-font2);">
+                    SPSA Params View
+                 </div>
+            {% else %}
+                 <div style="display:flex; align-items:center; justify-content:center; height:100%; color: var(--color-font2);">
+                    Game Progress View
+                 </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<script>
+    
+</script>

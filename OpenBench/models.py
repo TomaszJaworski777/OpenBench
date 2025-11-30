@@ -206,6 +206,10 @@ class Test(Model):
     def spsa_game_target(self):
         return int(self.spsa['iterations'] * self.spsa['pairs_per'] * 2)
 
+    def lrr_percentage(self):
+        size = abs(self.lowerllr - self.upperllr)
+        return max(min(int(((self.currentllr + abs(self.lowerllr)) / size) * 100.0), 100), 0)
+
 class LogEvent(Model):
 
     author     = CharField(max_length=128) # Username for the OpenBench Profile
