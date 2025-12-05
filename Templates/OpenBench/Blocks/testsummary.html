@@ -191,13 +191,159 @@
                 </div>
 
             {% elif test.test_mode == "SPSA" %}
-                 <div style="display:flex; align-items:center; justify-content:center; height:100%; color: var(--color-font2);">
-                    SPSA Params View
-                 </div>
+            <div style="font-family: 'Segoe UI'; display: flex; flex-direction: column; height: 100%;">
+
+                <div class="section">
+                    <div class="games-grid" style="grid-template-columns: 1fr 1px 1fr; gap: 0; margin-bottom: 5px;">
+                        
+                        <div class="stat-block">
+                            <span class="label">Iterations</span>
+                            <span class="text-mono" style="font-size: 1.4rem; color: var(--color-font1); line-height: 1.1;">
+                                {{ test.spsa_iterations_done }}
+                            </span>
+                            <span class="sub-label text-mono" style="text-transform: uppercase; padding-top: 2px; color: #54565d;">
+                                target: {{ test.spsa.iterations }}
+                            </span>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="stat-block">
+                            <span class="label">Games</span>
+                            <span class="text-mono" style="font-size: 1.4rem; color: var(--color-font1); line-height: 1.1;">
+                                {{ test.games }}
+                            </span>
+                            <span class="sub-label text-mono" style="text-transform: uppercase; padding-top: 2px; color: #54565d;">
+                                target: {{ test.spsa_game_target }}
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="llr-header">
+                        <span class="label" style="margin-bottom: 0;">Progress</span>
+                        <span class="text-mono" style="color: var(--color-font3);">
+                            {% if test.spsa_iterations_done >= test.spsa.iterations %}
+                                100%
+                            {% else %}
+                                {% widthratio test.spsa_iterations_done test.spsa.iterations 100 %}%
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="llr-bar-container">
+                        <div class="progress-bar" style="height: 100%; width: {% widthratio test.spsa_iterations_done test.spsa.iterations 100 %}%;"></div>
+                    </div>
+                </div>
+
+                <div class="section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: 15px;">
+                    <div class="label" style="margin-bottom: 6px;">SPSA Parameters</div>
+                    
+                    <div class="selectable" style="flex: 1 1 0; overflow-y: auto; border-radius: 4px; padding: 5px 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tbody>
+                                {% for name, data in test.spsa.parameters.items %}
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.05); overflow-x: hidden;">
+                                        <td class="text-mono spsa-entry" style="padding: 6px 12px; border: none; width: 50%;">
+                                            {{ name }}
+                                        </td>
+                                        
+                                        <td class="text-mono spsa-param" style="padding: 6px 12px; border: none; width: 50%;">
+                                            <span style="color: #686a6e;">{{ data.start|floatformat:3 }}</span>
+                                            <span style="color: var(--color-font3); margin: 0 5px;">&rarr;</span>
+                                            <span style="color: #fff;">{{ data.value|floatformat:3 }}</span>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="2" style="padding: 10px; color: #72767d; text-align: center; border: none;">
+                                            No parameters data available.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
             {% else %}
-                 <div style="display:flex; align-items:center; justify-content:center; height:100%; color: var(--color-font2);">
-                    Game Progress View
-                 </div>
+                <div style="font-family: 'Segoe UI';">
+
+                    <div class="section text-center">
+                        <div class="label">Elo Rating</div>
+                        <div class="elo-value text-mono dynamic-color" data-percentage="{{test.elo_percentage}}">
+                            {{test.elo}}
+                        </div>
+                        <div class="sub-label text-mono">
+                            Bounds: [{{test.elolower}}, {{test.eloupper}}]
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="llr-header">
+                            <span class="label" style="margin-bottom: 0;">Progress</span>
+                            <span class="text-mono" style="color: var(--color-font3);">
+                                {% widthratio test.games test.max_games 100 %}%
+                            </span>
+                        </div>
+                        
+                        <div class="llr-bar-container">
+                            <div class="progress-bar" style="height: 100%; width: {% widthratio test.games test.max_games 100 %}%;"></div>
+                        </div>
+
+                        <div class="llr-bounds" style="justify-content: flex-end;">
+                            <span>Target: {{test.max_games}}</span>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="games-grid">
+                            
+                            <div class="stat-block">
+                                <span class="label">Games</span>
+                                <span class="text-mono" style="font-size: 1.2rem; color: #fff;">
+                                    {{test.games}}
+                                </span>
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <div class="stat-block">
+                                <span class="label">Win / Draw / Loss</span>
+                                <div class="wdl-values text-mono">
+                                    <span class="c-win">+{{test.wins}}</span>
+                                    <span class="c-draw">={{test.draws}}</span>
+                                    <span class="c-loss">-{{test.losses}}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="label text-center">Pentanomial Distribution</div>
+                        
+                        <div class="penta-graph-container" style="margin-top: 15px; height: 55px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #3f4147;">
+                            <div class="penta-col" data-val="{{ test.LL }}"><div class="penta-bar bar-ll"></div></div>
+                            <div class="penta-col" data-val="{{ test.LD }}"><div class="penta-bar bar-ld"></div></div>
+                            <div class="penta-col" data-val="{{ test.DD }}"><div class="penta-bar bar-dd"></div></div>
+                            <div class="penta-col" data-val="{{ test.DW }}"><div class="penta-bar bar-dw"></div></div>
+                            <div class="penta-col" data-val="{{ test.WW }}"><div class="penta-bar bar-ww"></div></div>
+                        </div>
+
+                        <div class="penta-numbers">
+                            <span class="penta-num">{{test.LL}}</span>
+                            <span class="penta-num">{{test.LD}}</span>
+                            <span class="penta-num">{{test.DD}}</span>
+                            <span class="penta-num">{{test.DW}}</span>
+                            <span class="penta-num">{{test.WW}}</span>
+                        </div>
+                    </div>
+
+                </div>
             {% endif %}
         </div>
     </div>

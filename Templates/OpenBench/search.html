@@ -152,7 +152,7 @@
         {% for test in tests %}
             <tr>
                 <td class="datestamp">{{test.creation|date:"U"}}</td>
-                {% include "OpenBench/Blocks/testsummary.html" %}
+                {% include "OpenBench/Blocks/historyentry.html" %}
             </tr>
         {% endfor %}
     </table>

@@ -132,7 +132,7 @@
                 <div class="stats-grid" style="grid-template-columns: 1fr 1.5fr 1.5fr;">
                     <div class="stat-col border-right">
                         <div class="stat-label">Elo Rating</div>
-                        <div class="stat-value highlight-elo">{{ test.elo }}</div>
+                        <div class="stat-value dynamic-color" data-percentage="{{test.elo_percentage}}">{{ test.elo }}</div>
                         <div class="stat-detail">Bounds: [{{test.elolower|floatformat:2}}, {{test.eloupper|floatformat:2}}]</div>
                     </div>
                     <div class="stat-col border-right" style="width: 554px;">

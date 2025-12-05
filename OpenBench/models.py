@@ -210,6 +210,13 @@ class Test(Model):
         size = abs(self.lowerllr - self.upperllr)
         return max(min(int(((self.currentllr + abs(self.lowerllr)) / size) * 100.0), 100), 0)
 
+    def elo_percentage(self):
+        (_, elo, _) = Elo(self.as_tri())
+        progress = min(max(self.games / self.max_games, 0), 1)
+        normalized_elo = min(max((elo + 10) / 20, 0), 1)
+        result = int((1.0 - progress) * 50 + progress * int(round(normalized_elo * 100)))
+        return min(max(result, 0), 100)
+
 class LogEvent(Model):
 
     author     = CharField(max_length=128) # Username for the OpenBench Profile

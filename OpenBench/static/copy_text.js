@@ -74,17 +74,17 @@ function copy_text_from_test(test) {
         }
     });
 
-    result = "";
+    result = "```\n";
 
     result += align_to_center(test.title) + "\n";
-    result += align_to_left("TC: " + test.tc + "s", 16) + "|" + align_to_center("Hash: " + hash, 14) + "|" + align_to_right("Threads: " + threads, 12) + "\n";
-    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    result += align_to_left("TC: " + test.tc, 15) + "|" + align_to_center("Hash: " + hash, 14) + "|" + align_to_right("Threads: " + threads, 12) + "\n";
+    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
     switch(test.mode) {
         case 'SPRT': {
             result += "Elo     : " + test.elo + " (95%)\n";
             result += "LLR     : " + test.llr + "\n";
-            result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             wr = (100 * parseInt(test.w) / (parseInt(test.w) + parseInt(test.l))).toFixed(1);
             result += "Games   : " + test.games + " (" + wr + "%)\n";
             result += "W-D-L   : +" + test.w + " =" + test.d + " -" + test.l + "\n";
@@ -101,8 +101,8 @@ function copy_text_from_test(test) {
         }
     }
 
-    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-    result += align_to_center(window.location.origin + test.url);
+    result += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n```";
+    result += window.location.origin + test.url;
 
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(result).then(() => {
